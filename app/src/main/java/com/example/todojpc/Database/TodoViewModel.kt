@@ -43,4 +43,14 @@ class TodoViewModel : ViewModel() {
 
         }
     }
+
+    fun updateTodoTitle(id: Int, completed: String) {
+     viewModelScope.launch(Dispatchers.IO){
+         val todo = todoDao.getTodoById(id)
+         todo?.let {
+             val updatedTodo = it.copy(title = completed)
+             todoDao.updateTodo(updatedTodo)
+         }
+     }
+    }
 }

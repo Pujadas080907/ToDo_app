@@ -6,6 +6,7 @@ package com.example.todojpc.ui
 import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -104,7 +105,10 @@ fun ContentScreen(
 @Composable
 fun TodoListScreen(todoViewModel: TodoViewModel) {
     val todoList by todoViewModel.todoList.observeAsState()
+
     var inputText by remember { mutableStateOf("") }
+    var isEditing by remember{ mutableStateOf(false) }
+    var editTodo by remember{ mutableStateOf<Int?>(null) }
 
     Column(
         modifier = Modifier
@@ -127,14 +131,23 @@ fun TodoListScreen(todoViewModel: TodoViewModel) {
                     focusedBorderColor = Color.Gray,
                     unfocusedBorderColor = Color.LightGray
                 ),
-                placeholder = { Text(text = " Write To-Do...") }
+                placeholder = { Text(text = " Write your Task...") }
             )
             Button(
                 onClick = {
                     if (inputText.isNotBlank()) {
-                        todoViewModel.addTodo(inputText)
-                        inputText = ""
+                        if (isEditing && editTodo != null) {
+                            // Update existing task
+                            todoViewModel.updateTodoTitle(editTodo!!, inputText)
+                            isEditing = false  // Exit editing mode
+                            editTodo = null
+                        } else {
+                            // Add new task
+                            todoViewModel.addTodo(inputText)
+                        }
+                        inputText = ""  // Clear the input field
                     }
+
                 },
                 modifier = Modifier
                     .padding(start = 8.dp)
@@ -167,7 +180,12 @@ fun TodoListScreen(todoViewModel: TodoViewModel) {
                     TodoItem(
                         item = item,
                         onDelete = { todoViewModel.deleteTodo(item.id) },
-                        onCompleteChanged = { completed -> todoViewModel.updateTodoCompletion(item.id, completed) }
+                        onCompleteChanged = { completed -> todoViewModel.updateTodoCompletion(item.id, completed) },
+                        onEdit ={
+                            inputText = item.title
+                            isEditing = true
+                            editTodo = item.id
+                        }
                     )
                 }
             }
@@ -181,11 +199,12 @@ fun TodoListScreen(todoViewModel: TodoViewModel) {
 }
 
 @Composable
-fun TodoItem(item: Todo, onDelete: () -> Unit, onCompleteChanged: (Boolean) -> Unit) {
+fun TodoItem(item: Todo, onDelete: () -> Unit, onCompleteChanged: (Boolean) -> Unit, onEdit: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp),
+            .padding(4.dp)
+            .clickable { onEdit() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFF189AB4)
