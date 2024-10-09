@@ -11,5 +11,7 @@ data class Note(
     @PrimaryKey(autoGenerate = true)
     var id : Int=0,
     var title : String,
-    var body : String
+    var body : String,
+    var createdAt : Date = Date(),
+    var updateAt: Date? = null
 )
