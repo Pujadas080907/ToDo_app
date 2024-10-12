@@ -4,8 +4,10 @@
 package com.example.todojpc.ui
 
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -14,15 +16,18 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -34,8 +39,10 @@ import com.example.todojpc.Database.Todo
 import com.example.todojpc.Database.TodoViewModel
 import com.example.todojpc.R
 import com.example.todojpc.pages.Navitems
+
 import java.text.SimpleDateFormat
 import java.util.Locale
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -55,7 +62,7 @@ fun TodoListPage(todoViewModel: TodoViewModel, noteViewModel: NoteViewModel) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            if (selectedIndex != 1) {
+
                 NavigationBar {
                     navItemList.forEachIndexed { index, navitems ->
                         NavigationBarItem(
@@ -66,7 +73,7 @@ fun TodoListPage(todoViewModel: TodoViewModel, noteViewModel: NoteViewModel) {
                         )
                     }
                 }
-            }
+
         }
     ) { innerPadding ->
         // Call ContentScreen based on the selected index in bottom navigation
@@ -109,6 +116,11 @@ fun TodoListScreen(todoViewModel: TodoViewModel) {
     var inputText by remember { mutableStateOf("") }
     var isEditing by remember{ mutableStateOf(false) }
     var editTodo by remember{ mutableStateOf<Int?>(null) }
+    var searchText by remember { mutableStateOf("") }
+
+
+    // State for showing the bottom sheet
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -116,7 +128,7 @@ fun TodoListScreen(todoViewModel: TodoViewModel) {
             .padding(10.dp)
     ) {
         // Input section
-        Row(
+       /* Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(5.dp),
@@ -166,7 +178,29 @@ fun TodoListScreen(todoViewModel: TodoViewModel) {
                 )
             }
         }
-
+*/
+        TextField(
+            value = searchText,
+            onValueChange = { searchText = it },
+            placeholder = { Text(text = "Search Tasks", color = Color.Gray) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = Color.Transparent),
+            singleLine = true,
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = "Search Icon",
+                    tint = Color.Gray
+                )
+            },
+            colors = TextFieldDefaults.textFieldColors(
+                containerColor = Color.Transparent,
+                focusedIndicatorColor = Color(0xFF189AB4).copy(alpha = 0.2f),
+                unfocusedIndicatorColor = Color(0xFF189AB4).copy(alpha = 0.2f),
+                focusedLabelColor = Color.Black
+            )
+        )
         // Display the list of todos
         todoList?.let {
             LazyVerticalGrid(
@@ -196,7 +230,113 @@ fun TodoListScreen(todoViewModel: TodoViewModel) {
             fontSize = 16.sp
         )
     }
+    Box(
+        modifier = Modifier
+            .fillMaxSize(),
+        contentAlignment = Alignment.BottomEnd
+    ) {
+
+        FloatingActionButton(
+            onClick = { showBottomSheet = true},
+            modifier = Modifier
+                .padding(0.dp,0.dp,20.dp,0.dp),
+            shape = CircleShape,
+            containerColor = Color(0xFF189AB4)
+        ) {
+            Icon(Icons.Filled.Add, contentDescription = "Add")
+        }
+
+        // Show bottom sheet for adding new task
+        if (showBottomSheet) {
+            AddTaskBottomSheet(
+                onDismiss = { showBottomSheet = false },
+                onAddTask = { newTask ->
+                    todoViewModel.addTodo(newTask)
+                    showBottomSheet = false
+                },
+                currentTaskTitle = if (isEditing) inputText else ""
+            )
+        }
+    }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddTaskBottomSheet(onDismiss: () -> Unit, onAddTask: (String) -> Unit, currentTaskTitle: String) {
+    var inputText by remember { mutableStateOf(currentTaskTitle) }
+    var showToast by remember { mutableStateOf(false) } // State to trigger the toast
+
+    // Get the context for showing the toast
+    val context = LocalContext.current
+
+    // If showToast is true, show the toast and reset the flag
+    LaunchedEffect(showToast) {
+        if (showToast) {
+            Toast.makeText(context, "Please input a task", Toast.LENGTH_SHORT).show()
+            showToast = false
+        }
+    }
+
+    // Bottom sheet dialog
+    ModalBottomSheet(
+        onDismissRequest = { onDismiss() },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(text = "Add Task", fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp))
+
+            TextField(
+                value = inputText,
+                onValueChange = { inputText = it },
+                placeholder = { Text(text = "Input your task ") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = Color.LightGray.copy(0.2f), // Set the background color
+                    focusedIndicatorColor = Color(0xFF189AB4).copy(0.2f), // Focused underline color
+                    unfocusedIndicatorColor = Color.Transparent // No underline when unfocused
+                )
+            )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+
+            ){
+                Button(
+                    onClick = {
+                        if (inputText.isNotBlank()) {
+                            onAddTask(inputText)
+                            inputText = ""
+                        }else{
+                            showToast = true
+                        }
+                    },
+                    modifier = Modifier
+                        .size(56.dp)
+                        .align(Alignment.BottomEnd),
+                    contentPadding = PaddingValues(0.dp),
+
+                    shape = CircleShape,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF189AB4))
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.uparrow),
+                        contentDescription = "push task",
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
+            }
+
+        }
+    }
+}
+
+
 
 @Composable
 fun TodoItem(item: Todo, onDelete: () -> Unit, onCompleteChanged: (Boolean) -> Unit, onEdit: () -> Unit) {

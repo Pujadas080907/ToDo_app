@@ -152,7 +152,7 @@ fun NotesPage(noteViewModel: NoteViewModel) {
             FloatingActionButton(
                 onClick = { showAddNotePage = true },
                 modifier = Modifier
-                    .padding(0.dp,0.dp,20.dp,10.dp),
+                    .padding(0.dp,0.dp,20.dp,0.dp),
                 shape = CircleShape,
                 containerColor = Color(0xFF189AB4)
             ) {

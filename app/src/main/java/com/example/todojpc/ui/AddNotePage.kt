@@ -1,5 +1,6 @@
 package com.example.todojpc.ui
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -7,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -20,6 +22,18 @@ import com.example.todojpc.R
 fun AddNotePage(onNoteAdded: (String, String) -> Unit, onBack: () -> Unit) {
     var title by remember { mutableStateOf("") }
     var body by remember { mutableStateOf("") }
+    var showToast by remember { mutableStateOf(false) } // State to trigger the toast
+
+    // Get the context for showing the toast
+    val context = LocalContext.current
+
+    // If showToast is true, show the toast and reset the flag
+    LaunchedEffect(showToast) {
+        if (showToast) {
+            Toast.makeText(context, "Please write something...", Toast.LENGTH_SHORT).show()
+            showToast = false
+        }
+    }
 
     BackHandler {
         onBack()
@@ -48,6 +62,8 @@ fun AddNotePage(onNoteAdded: (String, String) -> Unit, onBack: () -> Unit) {
             IconButton(onClick = {
                 if (title.isNotBlank() && body.isNotBlank()) {
                     onNoteAdded(title, body) // Add note and navigate back
+                }else{
+                    showToast = true
                 }
             }) {
                 Icon(
