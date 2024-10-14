@@ -127,58 +127,7 @@ fun TodoListScreen(todoViewModel: TodoViewModel) {
             .fillMaxHeight()
             .padding(10.dp)
     ) {
-        // Input section
-       /* Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(5.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            OutlinedTextField(
-                value = inputText,
-                onValueChange = { inputText = it },
-                modifier = Modifier.weight(1f),
-                maxLines = 2,
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color.Gray,
-                    unfocusedBorderColor = Color.LightGray
-                ),
-                placeholder = { Text(text = " Write your Task...") }
-            )
-            Button(
-                onClick = {
-                    if (inputText.isNotBlank()) {
-                        if (isEditing && editTodo != null) {
-                            // Update existing task
-                            todoViewModel.updateTodoTitle(editTodo!!, inputText)
-                            isEditing = false  // Exit editing mode
-                            editTodo = null
-                        } else {
-                            // Add new task
-                            todoViewModel.addTodo(inputText)
-                        }
-                        inputText = ""  // Clear the input field
-                    }
 
-                },
-                modifier = Modifier
-                    .padding(start = 8.dp)
-                    .size(50.dp),
-                shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF189AB4)
-                ),
-                contentPadding = PaddingValues(0.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.done),
-                    contentDescription = "Add",
-                    tint = Color.White,
-                    modifier = Modifier.size(25.dp)
-                )
-            }
-        }
-*/
         TextField(
             value = searchText,
             onValueChange = { searchText = it },
@@ -219,6 +168,7 @@ fun TodoListScreen(todoViewModel: TodoViewModel) {
                             inputText = item.title
                             isEditing = true
                             editTodo = item.id
+                            showBottomSheet = true;
                         }
                     )
                 }
@@ -247,7 +197,7 @@ fun TodoListScreen(todoViewModel: TodoViewModel) {
         }
 
         // Show bottom sheet for adding new task
-        if (showBottomSheet) {
+    /*    if (showBottomSheet) {
             AddTaskBottomSheet(
                 onDismiss = { showBottomSheet = false },
                 onAddTask = { newTask ->
@@ -256,13 +206,35 @@ fun TodoListScreen(todoViewModel: TodoViewModel) {
                 },
                 currentTaskTitle = if (isEditing) inputText else ""
             )
+        }*/
+        if (showBottomSheet) {
+            AddTaskBottomSheet(
+                onDismiss = { showBottomSheet = false },
+                onAddTask = { newTask ->
+                    if (isEditing && editTodo != null) {
+                        // Update the task if editing
+                        todoViewModel.updateTodoTitle(editTodo!!, newTask)
+                    } else {
+                        // Add new task
+                        todoViewModel.addTodo(newTask)
+                    }
+                    showBottomSheet = false
+                },
+                currentTaskTitle = inputText,
+                isEditing = isEditing
+            )
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddTaskBottomSheet(onDismiss: () -> Unit, onAddTask: (String) -> Unit, currentTaskTitle: String) {
+fun AddTaskBottomSheet(
+    onDismiss: () -> Unit,
+    onAddTask: (String) -> Unit,
+    currentTaskTitle: String,
+    isEditing: Boolean = false
+) {
     var inputText by remember { mutableStateOf(currentTaskTitle) }
     var showToast by remember { mutableStateOf(false) } // State to trigger the toast
 
@@ -288,7 +260,10 @@ fun AddTaskBottomSheet(onDismiss: () -> Unit, onAddTask: (String) -> Unit, curre
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(text = "Add Task", fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp))
+            Text(
+                text = if(isEditing) "Edit Task" else "Add Task",
+                fontSize = 20.sp,
+                modifier = Modifier.padding(bottom = 8.dp))
 
             TextField(
                 value = inputText,
@@ -340,6 +315,8 @@ fun AddTaskBottomSheet(onDismiss: () -> Unit, onAddTask: (String) -> Unit, curre
 
 @Composable
 fun TodoItem(item: Todo, onDelete: () -> Unit, onCompleteChanged: (Boolean) -> Unit, onEdit: () -> Unit) {
+
+
     Card(
         modifier = Modifier
             .fillMaxWidth()

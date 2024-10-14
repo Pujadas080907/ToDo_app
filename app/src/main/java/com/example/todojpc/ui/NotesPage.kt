@@ -168,78 +168,11 @@ fun NotesPage(noteViewModel: NoteViewModel) {
 
 
 
-/*
 @Composable
 fun NoteItem(note: Note, onDelete: () -> Unit, onClick: () -> Unit) {
 
-    Card(
-        modifier = Modifier
-            .width(160.dp)
-            .height(120.dp) // Adjusted height for better text accommodation
-            .padding(4.dp)
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF189AB4)
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 5.dp
-        )
-    ) {
-        Box( // Use Box to allow layering of elements
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // Column for text content
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-                    .align(Alignment.TopStart), // Align text at the top left
-                verticalArrangement = Arrangement.SpaceBetween // Distribute space evenly
-            ) {
-                Text(
-                    text = note.title,
-                    fontSize = 16.sp,
-                    color = Color.Black,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = note.body,
-                    fontSize = 14.sp,
-                    color = Color.White,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = SimpleDateFormat("HH:mm aa, dd/MM", Locale.ENGLISH).format(note.createdAt),
-                fontSize = 10.sp,
-                color = Color.LightGray
-            )
-
-            // Align delete icon at the bottom right
-            IconButton(
-                onClick = onDelete,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd) // Align icon to the bottom right
-                    .padding(1.dp) // Add padding to the icon
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.dlticon),
-                    contentDescription = "Delete",
-                    tint = Color.White
-                )
-            }
-        }
-    }
-}
-*/
 
 
-@Composable
-fun NoteItem(note: Note, onDelete: () -> Unit, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .width(160.dp)
