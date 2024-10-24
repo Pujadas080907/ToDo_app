@@ -46,7 +46,10 @@ import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TodoListPage(todoViewModel: TodoViewModel, noteViewModel: NoteViewModel) {
+fun TodoListPage(
+    todoViewModel: TodoViewModel,
+    noteViewModel: NoteViewModel,
+    onSignOut: () ->Unit) {
     var selectedIndex by remember { mutableStateOf(0) }
 
     val navItemList = listOf(
@@ -86,7 +89,8 @@ fun TodoListPage(todoViewModel: TodoViewModel, noteViewModel: NoteViewModel) {
                 modifier = Modifier.padding(innerPadding),
                 selectedIndex = selectedIndex,
                 todoViewModel = todoViewModel,
-                noteViewModel = noteViewModel
+                noteViewModel = noteViewModel,
+                onSignOut = onSignOut
             )
         }
     }
@@ -98,12 +102,13 @@ fun ContentScreen(
     modifier: Modifier = Modifier,
     selectedIndex: Int,
     todoViewModel: TodoViewModel,
-    noteViewModel: NoteViewModel
+    noteViewModel: NoteViewModel,
+    onSignOut: () -> Unit
 ) {
     when (selectedIndex) {
         0 -> TodoListScreen(todoViewModel = todoViewModel)  // Home Page (Todo list)
         1 -> NotesPage(noteViewModel = noteViewModel)       // Notes Page
-        // else -> ProfilePage()  // Placeholder for Profile Page
+        2 -> ProfilePage(onSignOut = onSignOut)
     }
 }
 

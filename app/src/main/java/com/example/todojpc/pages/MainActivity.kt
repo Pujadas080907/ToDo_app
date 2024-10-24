@@ -2,10 +2,13 @@
 
 package com.example.todojpc.pages
 
+import android.app.Activity
 import android.os.Build
 import android.os.Bundle
 import android.view.animation.OvershootInterpolator
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
@@ -38,18 +41,20 @@ import com.example.todojpc.R
 import com.example.todojpc.ui.TodoListPage
 import kotlinx.coroutines.delay
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.platform.LocalContext
 
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.todojpc.Database.AuthViewModel
+
 
 
 class MainActivity : ComponentActivity() {
@@ -82,8 +87,17 @@ fun Navigation(todoViewModel: TodoViewModel, noteViewModel: NoteViewModel, authV
             SignInPage(navController = navController, authViewModel = authViewModel)
 
         }
-        composable("main_screen") {
-            TodoListPage(todoViewModel = todoViewModel, noteViewModel = noteViewModel)
+        composable("main_screen")
+        {
+            val context = LocalContext.current
+            BackHandler {
+                (context as? Activity)?.finish()
+            }
+            val onSignOut: ()-> Unit ={
+                authViewModel.signout()
+                navController.navigate("signInPage")
+            }
+            TodoListPage(todoViewModel = todoViewModel, noteViewModel = noteViewModel, onSignOut = onSignOut)
         }
     }
 }
@@ -131,6 +145,9 @@ fun SignUpPage(navController: NavController, authViewModel: AuthViewModel) {
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+   // var errorMsg by remember { mutableStateOf("") }
+
+    val context = LocalContext.current
 
     val authState = authViewModel.authState.observeAsState()
 
@@ -164,14 +181,21 @@ fun SignUpPage(navController: NavController, authViewModel: AuthViewModel) {
 
         Button(
             onClick = {
-              authViewModel.signup(email,password)
-                navController.navigate("main_screen")
+//              authViewModel.signup(email,password)
+//                navController.navigate("main_screen")
+                if (email.contains("@")) {
+                    authViewModel.signup(email, password)
+                    navController.navigate("main_screen")
+                } else {
+                   Toast.makeText(context, "Please enter a valid email id.", Toast.LENGTH_SHORT).show()
+                }
             },
             modifier = Modifier
                 .width(130.dp)
         ) {
             Text("Sign Up")
         }
+
 
         Spacer(modifier = Modifier.height(8.dp))
 
