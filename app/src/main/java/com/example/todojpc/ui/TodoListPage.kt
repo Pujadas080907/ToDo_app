@@ -3,10 +3,12 @@
 
 package com.example.todojpc.ui
 
+import android.app.Activity
 import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -29,11 +31,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.todojpc.Database.NoteViewModel
 import com.example.todojpc.Database.Todo
 import com.example.todojpc.Database.TodoViewModel
@@ -44,19 +52,17 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 
+
+
 @RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoListPage(
     todoViewModel: TodoViewModel,
-    noteViewModel: NoteViewModel,
-    onSignOut: () ->Unit) {
+    noteViewModel: NoteViewModel
+) {
     var selectedIndex by remember { mutableStateOf(0) }
-
-    val navItemList = listOf(
-        Navitems("Home", Icons.Default.Home),
-        Navitems("Notes", Icons.Default.Menu),
-        Navitems("Profile", Icons.Default.Person)
-    )
+    var showExitDialog by remember { mutableStateOf(false) } // State for showing exit dialog
 
     BackHandler(enabled = selectedIndex != 0) {
         selectedIndex = 0
@@ -64,22 +70,47 @@ fun TodoListPage(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-
-                NavigationBar {
-                    navItemList.forEachIndexed { index, navitems ->
-                        NavigationBarItem(
-                            selected = selectedIndex == index,
-                            onClick = { selectedIndex = index },
-                            icon = { Icon(imageVector = navitems.icon, contentDescription = "Icon") },
-                            label = { Text(text = navitems.label) }
+        topBar = {
+            if (selectedIndex == 0) {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            text = "NotesTasker",
+                            color = Color.White,
+                            style = TextStyle(fontSize = 19.sp)
                         )
-                    }
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { showExitDialog = true }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.back),
+                                contentDescription = "Back",
+                                tint = Color.White
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xFF189AB4)),
+                    modifier = Modifier.height(70.dp)
+                )
+            }
+        },
+        bottomBar = {
+            NavigationBar {
+                val navItemList = listOf(
+                    Navitems("Home", Icons.Default.Home),
+                    Navitems("Notes", Icons.Default.Menu)
+                )
+                navItemList.forEachIndexed { index, navitems ->
+                    NavigationBarItem(
+                        selected = selectedIndex == index,
+                        onClick = { selectedIndex = index },
+                        icon = { Icon(imageVector = navitems.icon, contentDescription = "Icon") },
+                        label = { Text(text = navitems.label) }
+                    )
                 }
-
+            }
         }
     ) { innerPadding ->
-        // Call ContentScreen based on the selected index in bottom navigation
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -89,9 +120,72 @@ fun TodoListPage(
                 modifier = Modifier.padding(innerPadding),
                 selectedIndex = selectedIndex,
                 todoViewModel = todoViewModel,
-                noteViewModel = noteViewModel,
-                onSignOut = onSignOut
+                noteViewModel = noteViewModel
             )
+
+            // Show Exit Confirmation Dialog
+            if (showExitDialog) {
+                ExitConfirmationDialog(
+                    onConfirm = {
+                        System.exit(0)
+                    },
+                    onDismiss = {
+                        showExitDialog = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ExitConfirmationDialog(onConfirm:  () -> Unit, onDismiss: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.5f)),
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            modifier = Modifier
+                .size(width = 280.dp, height = 150.dp)
+                .wrapContentSize(),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("Exit App", style = MaterialTheme.typography.titleLarge)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Do you want to exit the app?", textAlign = TextAlign.Center)
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Button(onClick = onDismiss,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF189AB4),
+                            contentColor = Color.White
+                        )
+
+                        ) {
+                        Text("No")
+                    }
+                    Button(onClick = {
+                        onConfirm()
+                        onDismiss()
+                    },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF189AB4),
+                            contentColor = Color.White
+                        )
+                        ) {
+                        Text("Yes")
+                    }
+                }
+            }
         }
     }
 }
@@ -102,13 +196,12 @@ fun ContentScreen(
     modifier: Modifier = Modifier,
     selectedIndex: Int,
     todoViewModel: TodoViewModel,
-    noteViewModel: NoteViewModel,
-    onSignOut: () -> Unit
+    noteViewModel: NoteViewModel
 ) {
     when (selectedIndex) {
-        0 -> TodoListScreen(todoViewModel = todoViewModel)  // Home Page (Todo list)
-        1 -> NotesPage(noteViewModel = noteViewModel)       // Notes Page
-        2 -> ProfilePage(onSignOut = onSignOut)
+        0 -> TodoListScreen(todoViewModel = todoViewModel)
+        1 -> NotesPage(noteViewModel = noteViewModel)
+
     }
 }
 
@@ -155,35 +248,76 @@ fun TodoListScreen(todoViewModel: TodoViewModel) {
                 focusedLabelColor = Color.Black
             )
         )
-        // Display the list of todos
-        todoList?.let {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(1),
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(3.dp),
-                horizontalArrangement = Arrangement.spacedBy(3.dp),
-                verticalArrangement = Arrangement.spacedBy(2.dp)
-            ) {
-                items(it) { item ->
-                    TodoItem(
-                        item = item,
-                        onDelete = { todoViewModel.deleteTodo(item.id) },
-                        onCompleteChanged = { completed -> todoViewModel.updateTodoCompletion(item.id, completed) },
-                        onEdit ={
-                            inputText = item.title
-                            isEditing = true
-                            editTodo = item.id
-                            showBottomSheet = true;
-                        }
+        val todoList = todoList?.filter {
+            it.title.contains(searchText, ignoreCase = true)
+        }
+
+        if(todoList.isNullOrEmpty()){
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(10.dp),
+                contentAlignment = Alignment.Center
+            ){
+                Column(
+
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                   Image(
+
+                       painter = painterResource(id = R.drawable.add),
+                       contentDescription = "add task",
+                       modifier = Modifier.size(200.dp)
+                   )
+
+                    Text( modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(fontSize = 18.sp, color = Color(0xFF189AB4), fontWeight = FontWeight.Bold)) {
+                                append("No tasks yet! 🌟\n")
+                            }
+                            withStyle(style = SpanStyle(fontSize = 16.sp, color = Color(0xFF555555), fontWeight = FontWeight.Medium)) {
+                                append("Start your journey by tapping the ➕ button !")
+                            }
+                        },
+                        fontSize = 16.sp
                     )
                 }
+
             }
-        } ?: Text(
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            text = "No Items yet",
-            fontSize = 16.sp
-        )
+
+        }else {
+
+            todoList?.let {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(1),
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(3.dp),
+                    horizontalArrangement = Arrangement.spacedBy(3.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    items(it) { item ->
+                        TodoItem(
+                            item = item,
+                            onDelete = { todoViewModel.deleteTodo(item.id) },
+                            onCompleteChanged = { completed ->
+                                todoViewModel.updateTodoCompletion(
+                                    item.id,
+                                    completed
+                                )
+                            },
+                            onEdit = {
+                                inputText = item.title
+                                isEditing = true
+                                editTodo = item.id
+                                showBottomSheet = true
+                            }
+                        )
+                    }
+                }
+            }
+        }
     }
     Box(
         modifier = Modifier
@@ -201,28 +335,25 @@ fun TodoListScreen(todoViewModel: TodoViewModel) {
             Icon(Icons.Filled.Add, contentDescription = "Add")
         }
 
-        // Show bottom sheet for adding new task
-    /*    if (showBottomSheet) {
-            AddTaskBottomSheet(
-                onDismiss = { showBottomSheet = false },
-                onAddTask = { newTask ->
-                    todoViewModel.addTodo(newTask)
-                    showBottomSheet = false
-                },
-                currentTaskTitle = if (isEditing) inputText else ""
-            )
-        }*/
+
         if (showBottomSheet) {
             AddTaskBottomSheet(
-                onDismiss = { showBottomSheet = false },
+                onDismiss = {
+                    showBottomSheet = false
+                    isEditing = false
+                    inputText = ""
+                            },
                 onAddTask = { newTask ->
                     if (isEditing && editTodo != null) {
                         // Update the task if editing
                         todoViewModel.updateTodoTitle(editTodo!!, newTask)
+                        isEditing = false
+                        editTodo = null
                     } else {
                         // Add new task
                         todoViewModel.addTodo(newTask)
                     }
+                    inputText = ""
                     showBottomSheet = false
                 },
                 currentTaskTitle = inputText,
@@ -256,7 +387,8 @@ fun AddTaskBottomSheet(
 
     // Bottom sheet dialog
     ModalBottomSheet(
-        onDismissRequest = { onDismiss() },
+        onDismissRequest = { onDismiss()
+                           inputText=""},
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(

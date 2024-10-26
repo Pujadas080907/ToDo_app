@@ -2,6 +2,7 @@
 
 package com.example.todojpc.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -48,8 +50,14 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -122,22 +130,34 @@ fun NotesPage(noteViewModel: NoteViewModel) {
                     focusedLabelColor = Color.Black
                 )
             )
+            if (notes.isEmpty()) {
+                EmptyNotesState()
+            } else {
 
-            // List of Notes
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(notes.filter { it.title.contains(searchText, ignoreCase = true) || it.body.contains(searchText, ignoreCase = true) }) { note ->
-                    NoteItem(note = note,
-                      onClick = {selectedNote = note
-                                showEditNotePage = true},
-                        onDelete = {
-                        noteViewModel.deleteNote(note.id)
-                    })
+
+                // List of Notes
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(notes.filter {
+                        it.title.contains(
+                            searchText,
+                            ignoreCase = true
+                        ) || it.body.contains(searchText, ignoreCase = true)
+                    }) { note ->
+                        NoteItem(note = note,
+                            onClick = {
+                                selectedNote = note
+                                showEditNotePage = true
+                            },
+                            onDelete = {
+                                noteViewModel.deleteNote(note.id)
+                            })
+                    }
                 }
             }
         }
@@ -239,6 +259,38 @@ fun NoteItem(note: Note, onDelete: () -> Unit, onClick: () -> Unit) {
                     )
                 }
             }
+        }
+    }
+}
+
+
+@Composable
+fun EmptyNotesState() {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.notebook1),
+                contentDescription = "No Notes",
+                modifier = Modifier.size(200.dp)
+            )
+            Text( modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(fontSize = 18.sp, color = Color(0xFF189AB4), fontWeight = FontWeight.Bold)) {
+                        append("No Notes yet! 🌟\n")
+                    }
+                    withStyle(style = SpanStyle(fontSize = 16.sp, color = Color(0xFF555555), fontWeight = FontWeight.Medium)) {
+                        append("Start your journey by tapping the ➕ button !")
+                    }
+                },
+                fontSize = 16.sp
+            )
         }
     }
 }
