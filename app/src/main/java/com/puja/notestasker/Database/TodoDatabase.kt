@@ -1,4 +1,4 @@
-package com.example.todojpc.Database
+package com.puja.notestasker.Database
 
 import android.content.Context
 import androidx.room.Database
@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-import com.example.todojpc.pages.ConvertersClass
+import com.puja.notestasker.pages.ConvertersClass
 
 
 @Database(entities = [Todo::class, Note::class], version = 2, exportSchema = false)

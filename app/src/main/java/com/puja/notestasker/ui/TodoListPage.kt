@@ -1,9 +1,8 @@
 
 
 
-package com.example.todojpc.ui
+package com.puja.notestasker.ui
 
-import android.app.Activity
 import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -21,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -41,12 +39,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import com.example.todojpc.Database.NoteViewModel
-import com.example.todojpc.Database.Todo
-import com.example.todojpc.Database.TodoViewModel
-import com.example.todojpc.R
-import com.example.todojpc.pages.Navitems
+import com.puja.notestasker.Database.NoteViewModel
+import com.puja.notestasker.Database.Todo
+import com.puja.notestasker.Database.TodoViewModel
+import com.puja.notestasker.R
+import com.puja.notestasker.pages.Navitems
 
 import java.text.SimpleDateFormat
 import java.util.Locale

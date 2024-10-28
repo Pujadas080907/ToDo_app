@@ -1,4 +1,4 @@
-package com.example.todojpc
+package com.puja.notestasker
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

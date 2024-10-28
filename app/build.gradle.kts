@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.todojpc"
+    namespace = "com.puja.notestasker"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.todojpc"
+        applicationId = "com.puja.notestasker"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -25,6 +25,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -91,11 +92,7 @@ dependencies {
 
     implementation("androidx.navigation:navigation-compose:2.8.1")
 
-    // for authentication with Google
-    implementation("com.google.android.gms:play-services-auth:21.2.0")
-    implementation("androidx.credentials:credentials:1.3.0")
-    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
-    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+
 
     //img load
     implementation("io.coil-kt:coil-compose:2.2.2")

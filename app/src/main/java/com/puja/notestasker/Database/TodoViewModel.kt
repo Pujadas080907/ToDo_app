@@ -1,11 +1,11 @@
-package com.example.todojpc.Database
+package com.puja.notestasker.Database
 
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.todojpc.pages.MainApplication
+import com.puja.notestasker.pages.MainApplication
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.Instant

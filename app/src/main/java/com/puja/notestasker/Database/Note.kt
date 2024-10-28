@@ -1,5 +1,4 @@
-package com.example.todojpc.Database
-
+package com.puja.notestasker.Database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -7,12 +6,12 @@ import java.util.Date
 
 
 @Entity
-data class Todo(
+data class Note(
 
     @PrimaryKey(autoGenerate = true)
     var id : Int=0,
     var title : String,
-    var createdAt : Date,
-    var completed: Boolean = false
+    var body : String,
+    var createdAt : Date = Date(),
+    var updateAt: Date? = null
 )
-

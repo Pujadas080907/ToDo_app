@@ -1,4 +1,4 @@
-package com.example.todojpc.ui
+package com.puja.notestasker.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,8 +13,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme // Not used but it's safe to keep for styling later.
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -28,8 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.todojpc.Database.Note
-import com.example.todojpc.R
+import com.puja.notestasker.Database.Note
+import com.puja.notestasker.R
 
 
 @OptIn(ExperimentalMaterial3Api::class)

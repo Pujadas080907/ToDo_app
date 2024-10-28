@@ -1,8 +1,8 @@
-package com.example.todojpc.pages
+package com.puja.notestasker.pages
 
 import android.app.Application
 import androidx.room.Room
-import com.example.todojpc.Database.TodoDatabase
+import com.puja.notestasker.Database.TodoDatabase
 
 class MainApplication : Application() {
 

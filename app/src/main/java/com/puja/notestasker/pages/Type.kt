@@ -1,4 +1,4 @@
-package com.example.todojpc.pages
+package com.puja.notestasker.pages
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
