@@ -18,7 +18,7 @@ NotesTasker a simple, intuitive app to manage tasks and notes in one place.
 - Search for task and notes
 ## Screenshots
 
-![App Screenshot](https://raw.githubusercontent.com/Pujadas080907/ToDo_app/main/todoapp.jpg)
+![App Screenshot](https://raw.githubusercontent.com/Pujadas080907/ToDo_app/main/screentodo.jpg)
 
 ![App Screenshot](https://raw.githubusercontent.com/Pujadas080907/ToDo_app/main/image1.jpeg)
 
